@@ -17,7 +17,7 @@ This Java crawler application is written under the following environment:
 Manually compiling .java files:
 ```shell
 javac -cp *.jar *.java
-java -cp ".:/*" Crawler
+java -cp ".:*" Crawler
 ```
 
 ## Licensing

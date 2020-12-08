@@ -3,6 +3,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
 import javax.swing.*;
 import javax.imageio.ImageIO;
 import java.awt.Image;
@@ -16,13 +19,19 @@ public class Crawler {
     static CrawlerOptions options = new CrawlerOptions();
     final static String[] languages = {"en", "jp"};
 
+    final static String testUrl = "https://api-danmemo-us.wrightflyer.net/asset/notice/view/2440";
+
     public static void main(String[] args) {
         // folder creation for notifications storage
         Path newsPath = Paths.get(mainDirectory + "/notifications/");
         try {
             Files.createDirectories(newsPath);
             for (String lang: languages){
-                Files.createDirectory(Paths.get(newsPath + "/" + lang + "/"));
+                // sub-folders for assets
+                String[] filePaths = {"/", "/img/", "/css/", "/js/"};
+                for (String fp: filePaths){
+                    Files.createDirectory(Paths.get(newsPath + "/" + lang + fp));
+                }
             }
         } catch (IOException e) {
             // EN/JP folder exists
@@ -30,11 +39,17 @@ public class Crawler {
 
 
 
+        Site test = new Site(testUrl);
+        test.crawl();
 
         /*
         Frame userInterface = new Frame();
         SwingUtilities.invokeLater(() -> {
         });
         */
+    }
+
+    void initializeAssets() {
+                
     }
 }

@@ -1,26 +1,17 @@
-enum Language {
-    EN,
-    JP
-}
-
 public class CrawlerOptions {
-    Language language = Language.EN;
+    String language = "en";
 
     public CrawlerOptions() {}
 
     void toggleLanguage() {
-        if(this.language == Language.EN) {
-            this.language = Language.JP;
+        if(this.language == "en"){
+            this.language = "jp";
         } else {
-            this.language = Language.EN;
+            this.language = "en";
         }
     }
 
     String getLanguage() {
-        if(this.language == Language.EN) {
-            return "en";
-        } else {
-            return "jp";
-        }
+        return this.language;
     }
 }

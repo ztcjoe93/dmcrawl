@@ -1,4 +1,4 @@
 #!/bin/bash
 
 javac -cp *.jar *.java
-java -cp '.:/*' Crawler
+java -cp  '.:*' Crawler
