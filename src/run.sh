@@ -1,4 +1,4 @@
 #!/bin/bash
 
-javac -cp *.jar *.java
-java -cp  '.:*' Crawler
+javac -cp ../lib/*.jar *.java
+java -cp '.:../lib/*' Crawler

@@ -4,8 +4,13 @@ Simple Java application to crawl and store past in-game news for the DanMachi - 
 
 
 ## Features
-- [ ] Recursive crawler to identify and store valid links within each news
-- [ ] Crawls both EN/JP API
+- [x] Recursive crawler to identify and store valid links within each category of news (News, DanMachi Info, Update, Malfunction)
+- [x] Local storage for images/css/js instead of referencing to the CDN
+- [x] Crawls both EN/JP API
+
+## In-progress
+- [ ] GUI for users
+- [ ] News selection UI for user 
 
 ## Environment
 This Java crawler application is written under the following environment:
@@ -16,8 +21,13 @@ This Java crawler application is written under the following environment:
 ## Compilation
 Manually compiling .java files:
 ```shell
-javac -cp *.jar *.java
-java -cp ".:*" Crawler
+javac -cp ../lib/*.jar *.java
+java -cp ".:../lib/*" Crawler
+```
+
+Or if you're on Linux, simply run the shell script in the src directory with:
+```shell
+./run.sh
 ```
 
 ## Licensing
