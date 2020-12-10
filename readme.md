@@ -1,11 +1,11 @@
 # DanMachi - MEMORIA FREESE News Crawler
 
-Simple Java application to crawl and store past in-game news for the DanMachi - MEMORIA FREESE game.
+Simple Java application to crawl and store in-game news for the DanMachi - MEMORIA FREESE mobile game.
 
 
 ## Features
-- [x] Recursive crawler to identify and store valid links within each category of news (News, DanMachi Info, Update, Malfunction)
-- [x] Local storage for images/css/js instead of referencing to the CDN
+- [x] Recursive crawler to identify and store html pages within each category of news (News, DanMachi Info, Update, Malfunction)
+- [x] Local storage for images/css/js instead of referencing to CDN
 - [x] Crawls both EN/JP API
 
 ## In-progress
@@ -18,7 +18,7 @@ This Java crawler application is written under the following environment:
 - jsoup 1.12.1
 
 
-## Compilation
+## Compiling
 Manually compiling .java files:
 ```shell
 javac -cp ../lib/*.jar *.java
