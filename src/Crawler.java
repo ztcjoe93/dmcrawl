@@ -18,12 +18,8 @@ public class Crawler {
     final static String baseUrl = 
         "https://api-danmemo-us.wrightflyer.net/asset/notice/index?read_more=1";
     static CrawlerOptions options = new CrawlerOptions();
-    final static String[] languages = {"jp"};//{"en", "jp"};
-
-    final static Map<String, String> notifHm = Map.of("news", "1", "info", "4", "update", "2", "malfunc", "3");
-
-    final static String testUrl = "https://api-danmemo.wrightflyer.net/asset/notice/view/3124";
-
+    final static String[] languages = {"en", "jp"};
+    final static Map<String, String> notifHm = Map.of("news", "1", "info", "4", "update", "2", "malfunc", "3");    
     public static void main(String[] args) {
         // folder creation for notifications storage
         Path newsPath = Paths.get(mainDirectory + "/notifications/");
@@ -41,55 +37,51 @@ public class Crawler {
             }
         } catch (IOException e) {
             e.printStackTrace();
-            // EN/JP folder exists
+        }
+
+        //startParse();
+    }
+
+    static void startParse(){
+        String lang = options.getLanguage();
+
+        Document doc = null;
+        String docUrl = null;
+
+        if (lang == "en") {
+            docUrl = baseUrl; 
+        } else {
+            docUrl = baseUrl.replace("-us", "");
+        }
+
+        try {
+            doc = Jsoup.connect(docUrl).get();
+        } catch(IOException e) {
+            e.printStackTrace();
         }
 
 
-        /*
-        Site testSite = new Site(testUrl, "info");
-        testSite.crawl();
-        */
-
-        for (String lang: languages) {
-            System.out.printf("Parsing %s now...%n", lang);
-            Document doc = null;
-            String docUrl = null;
-
-            if (lang == "en") {
-                docUrl = baseUrl; 
-            } else {
-                docUrl = baseUrl.replace("-us", "");
+        Elements newsElements = null, infoElements = null, updateElements = null, malfuncElements = null;
+        for (Map.Entry<String, String> set: notifHm.entrySet()) {
+            Elements ex = null;
+            switch(set.getKey()){
+                case "news":
+                    ex = newsElements;
+                    break;
+                case "info":
+                    ex = infoElements;
+                    break;
+                case "update":
+                    ex = updateElements;
+                    break;
+                case "malfunc":
+                    ex = malfuncElements;
+                    break;
             }
-
-            try {
-                doc = Jsoup.connect(docUrl).get();
-            } catch(IOException e) {
-                e.printStackTrace();
-            }
-
-
-            Elements newsElements = null, infoElements = null, updateElements = null, malfuncElements = null;
-            for (Map.Entry<String, String> set: notifHm.entrySet()) {
-                Elements ex = null;
-                switch(set.getKey()){
-                    case "news":
-                        ex = newsElements;
-                        break;
-                    case "info":
-                        ex = infoElements;
-                        break;
-                    case "update":
-                        ex = updateElements;
-                        break;
-                    case "malfunc":
-                        ex = malfuncElements;
-                        break;
-                }
-                ex = doc.select("#tab-panel" + set.getValue() + " > .newsFeed > a");
-                for(Element e: ex){
-                    Site site = new Site(e.attr("href"), set.getKey());
-                    site.crawl();
-                }
+            ex = doc.select("#tab-panel" + set.getValue() + " > .newsFeed > a");
+            for(Element e: ex){
+                Site site = new Site(e.attr("href"), set.getKey());
+                site.crawl();
             }
         }
     }

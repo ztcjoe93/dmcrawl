@@ -26,9 +26,9 @@ class Site {
         this.notifType = notifType;
 
         Pattern pattern = Pattern.compile("(.*\\.net)(.*)");
-        Matcher matcher = pattern.matcher(url);
-
         Pattern cdnPattern = Pattern.compile("(.*\\/us\\/)(.*)");
+
+        Matcher matcher = pattern.matcher(url);
 
         while (matcher.find()) {
             this.baseUrl = matcher.group(1);
@@ -57,32 +57,24 @@ class Site {
         System.out.println(this.url);
     }
 
+    boolean getOfficial(){
+        return this.official;
+    } 
 
-    public void crawl() {
-        if (!this.official) {
-            return;
-        }
-        Document doc = null;
-        try {
-            doc = Jsoup.connect(this.url).ignoreHttpErrors(true).get();
-        } catch (Exception e) { e.printStackTrace();
-        }
-
-        if (doc == null){
-            return;
-        }
-
-        // set title and id for current news
-        this.title = doc.select(".title").text().replace("/", "-");
-
-        // no valid .title tag
-        if(this.title.length() == 0) {
-            this.title = doc.select("title").text().replace("/", "-");
-        }
-
-        Pattern pattern = Pattern.compile("(jump\\(')(.*)('\\))");
+    private void setTitle(Document doc){
+        String title = doc.select(".title").text().replace("/", "-");
         
+        // if there is no valid title on page
+        if (title.length() == 0){
+            title = doc.select("title").text().replace("/", "-");
+        }
+        this.title = title;
+    }
+
+    private void getLinks(Document doc){
+        Pattern pattern = Pattern.compile("(jump\\(')(.*)('\\))");
         Elements links = doc.select("a[onclick*=jump]");
+        
         // add all valid anchor tags to ArrayList
         for (Element link: links) {
             Matcher matcher = pattern.matcher(link.attr("onclick"));
@@ -94,49 +86,62 @@ class Site {
                 } else {
                     finalizedUrl = this.baseUrl + matcher.group(2);
                 }
-                System.out.println(finalizedUrl);
+
                 if (finalizedUrl.contains("api-danmemo") || finalizedUrl.contains("cdn-danmemo")){
-                    //System.out.println(finalizedUrl + " || added to list");
                     this.linkedSites.add(new Site(finalizedUrl, notifType));
-                }
-                Document jsLink = null;
-                String linkTitle = null;
-                try {
-                    jsLink = Jsoup.connect(finalizedUrl).ignoreHttpErrors(true).get();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
 
-                linkTitle = jsLink.select(".title").text().replace("/", "-");
-                if(linkTitle.length() == 0) {
-                    linkTitle = jsLink.select("title").text().replace("/", "-");
-                }
+                    Document jsLink = null;
+                    String linkTitle = null;
+                    try {
+                        jsLink = Jsoup.connect(finalizedUrl).ignoreHttpErrors(true).get();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
 
-                // replace jump links with static refs to files in dir
-                
-                link.attr("onclick", "");
-                link.attr("href", "./"+linkTitle+".html");
+                    linkTitle = jsLink.select(".title").text().replace("/", "-");
+                    if(linkTitle.length() == 0) {
+                        linkTitle = jsLink.select("title").text().replace("/", "-");
+                    }
+
+                    // replace jump links with static refs to files in dir
+                    link.attr("onclick", "");
+                    link.attr("href", "./"+linkTitle+".html");
+                }
             }
         }
+    }
 
+    public void crawl() {
+        Document doc = null;
+        try {
+            doc = Jsoup.connect(this.url).ignoreHttpErrors(true).get();
+        } catch (Exception e) { 
+            e.printStackTrace();
+            return;
+        }
+
+        this.setTitle(doc);
+        this.getLinks(doc);
         this.writeToFile(doc);
 
 
         for(Site site: this.linkedSites) {
-            site.crawl();
+            if (site.getOfficial()){
+                site.crawl();
+            }
         }
     }
     
+
     void writeToFile(Document doc) {
         String directory = "notifications/" + this.lang + "/" + this.notifType + "/";
 
+        // grabbing all css files
         Element css = doc.select("link[href$=.css]").first();
-        Elements js = doc.select("script");
-
         Pattern cssPattern = Pattern.compile("(.*\\/)(.*\\/css\\/style\\.css)");
         Matcher cssMatcher = cssPattern.matcher(css.attr("abs:href"));
-
         String cssName = null;
+
         while (cssMatcher.find()){
             cssName = cssMatcher.group(2).replace("/", "-");
         }
@@ -152,6 +157,9 @@ class Site {
         };
         css.attr("href", "./css/" + cssName);
 
+
+        // grabbing all js files
+        Elements js = doc.select("script");
         Pattern jsPattern = Pattern.compile("(.*\\/)(.*\\/.*\\.js).*"); 
 
         for (Element j: js){
@@ -205,7 +213,7 @@ class Site {
 
         try {
             BufferedWriter writer = new BufferedWriter(
-                new FileWriter(directory + this.title + ".html")
+                new FileWriter(directory+this.title+".html")
             );
             writer.write(doc.outerHtml());
             writer.close();
