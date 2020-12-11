@@ -92,7 +92,9 @@ public class Crawler {
             for(Element e: ex){
                 if (!options.getSites().contains(e.attr("href"))){
                     Site site = new Site(e.attr("href"), set.getKey(), options, ui);
-                    Thread t = new Thread(() -> site.crawl());
+                    Thread t = new Thread(() -> {
+                        site.crawl();
+                    });
                     t.start();
                     tList.add(t);
                 }

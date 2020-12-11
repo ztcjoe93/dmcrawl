@@ -4,10 +4,10 @@ import java.awt.*;
 import java.nio.file.*;
 import javax.imageio.ImageIO;
 import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 class Frame extends JFrame {
-    private final static String bannerPath = "/res/danmemo.jpg";
-
     private CrawlerOptions options;
     private JLabel language = new JLabel();
     private JButton changeLang = new JButton("Change Language");
@@ -23,7 +23,6 @@ class Frame extends JFrame {
         this.setResizable(false);
         this.textInfo.setEditable(false);
 
-        //Path imgPath = Paths.get(System.getProperty("user.dir")).getParent();
         ImageIcon icon = new ImageIcon("../res/danmemo.jpg");
         JLabel imgLabel = new JLabel(icon);
 
@@ -67,7 +66,11 @@ class Frame extends JFrame {
         this.setVisible(true);
     }
 
-    void updateText(String text){
-        this.textInfo.append(text+"\n");
+    // to prevent race condition
+    synchronized void updateText(String text){
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String timeStamp = now.format(formatter);
+        this.textInfo.append("["+timeStamp+"] "+text+"\n");
     }
 }

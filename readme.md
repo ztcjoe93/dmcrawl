@@ -10,12 +10,15 @@ Simple Java application to crawl and store in-game news for the DanMachi - MEMOR
 - [x] Crawls both EN/JP API
 - [x] GUI for users
 
-## In-progress
-- [ ] News selection UI for user 
+## Screenshots
+
+![ui](./res/demo_1.png)
+![parse en](./res/demo_2.png)
+![parse jp](./res/demo_3.png)
 
 
 ## Caveats
-- Threads sometimes clash when updating JTextArea on UI
+- Checking of top-level .html files are based on the stored sites.txt
 
 ## Environment
 This Java crawler application is written under the following environment:

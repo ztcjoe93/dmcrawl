@@ -126,7 +126,7 @@ class Site {
         }
 
         this.setTitle(doc);
-        this.ui.updateText("Writing "+this.title);
+        this.ui.updateText(this.title);
         this.getLinks(doc);
         this.writeToFile(doc);
 
