@@ -12,9 +12,9 @@ Simple Java application to crawl and store in-game news for the DanMachi - MEMOR
 
 ## Screenshots
 
-![ui](./res/demo_1.png)
-![parse en](./res/demo_2.png)
-![parse jp](./res/demo_3.png)
+![](./res/demo_1.png)
+![](./res/demo_2.png)
+![](./res/demo_3.png)
 
 
 ## Caveats
