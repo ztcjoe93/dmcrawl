@@ -26,11 +26,20 @@ This Java crawler application is written under the following environment:
 - jsoup 1.12.1
 
 
-## Compiling
+## Compiling and running
 Manually compiling .java files:
 ```shell
 javac -cp ../lib/*.jar *.java
+```
+
+To run:
+```shell
 java -cp ".:../lib/*" Crawler
+```
+
+To compile into a .jar:
+```shell
+jar -cvfe Crawler.jar Crawler ./ 
 ```
 
 Or if you're on Linux, simply run the shell script in the src directory with:
