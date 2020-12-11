@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.text.DefaultCaret;
 import java.awt.*;
 import java.nio.file.*;
 import javax.imageio.ImageIO;
@@ -8,9 +9,10 @@ class Frame extends JFrame {
     private final static String bannerPath = "/res/danmemo.jpg";
 
     private CrawlerOptions options;
-    private JButton getLang = new JButton("Get Language");
+    private JLabel language = new JLabel();
     private JButton changeLang = new JButton("Change Language");
     private JButton startParse = new JButton("Start Parsing");
+    private JTextArea textInfo = new JTextArea(20, 70);
     
     public Frame(CrawlerOptions options) {
         super("ダンメモ News Crawler");
@@ -19,6 +21,7 @@ class Frame extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(900, 1000);
         this.setResizable(false);
+        this.textInfo.setEditable(false);
 
         //Path imgPath = Paths.get(System.getProperty("user.dir")).getParent();
         ImageIcon icon = new ImageIcon("../res/danmemo.jpg");
@@ -29,24 +32,32 @@ class Frame extends JFrame {
         JPanel bottomPanel = new JPanel();
 
         topPanel.add(imgLabel);
-        getLang.addActionListener(e -> {
-            System.out.println(this.options.getLanguage());
-        });
 
         changeLang.addActionListener(e -> {
             this.options.toggleLanguage();
-            System.out.println(this.options.getLanguage());
+            this.language.setText(this.options.getLanguage());
         });
 
         startParse.addActionListener(e -> {
-            System.out.println("Starting to parse "+this.options.getLanguage()+" news.");
-            Crawler.startParse();
+            this.updateText("Starting to parse "+this.options.getLanguage()+" news.");
+            Thread t = new Thread(() -> Crawler.startParse());
+            t.start();
         });
 
+        // to enable text to be aligned to bottom of scrollbar
+        DefaultCaret caret = (DefaultCaret) textInfo.getCaret();
+        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
-        middlePanel.add(getLang);
+        // scrollbar for jtextarea
+        JScrollPane scrollPane = new JScrollPane(textInfo, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.getPreferredSize();
+
+        language.setText(options.getLanguage());
+        middlePanel.add(language);
         middlePanel.add(changeLang);
         middlePanel.add(startParse);
+        bottomPanel.add(scrollPane);
 
         // add panels to frame
         this.add(topPanel);
@@ -56,7 +67,7 @@ class Frame extends JFrame {
         this.setVisible(true);
     }
 
-    void updateDisplay(String val){
-
+    void updateText(String text){
+        this.textInfo.append(text+"\n");
     }
 }

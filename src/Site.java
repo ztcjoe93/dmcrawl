@@ -21,11 +21,13 @@ class Site {
     private String lang, notifType;
     private boolean official;
     private CrawlerOptions options;
+    private Frame ui;
 
-    Site(String url, String notifType, CrawlerOptions options) {
+    Site(String url, String notifType, CrawlerOptions options, Frame ui) {
         this.url = url;
         this.notifType = notifType;
         this.options = options;
+        this.ui = ui;
 
         if(!options.getSites().contains(this.url)){
             Pattern pattern = Pattern.compile("(.*\\.net)(.*)");
@@ -91,7 +93,7 @@ class Site {
                 }
 
                 if (finalizedUrl.contains("api-danmemo") || finalizedUrl.contains("cdn-danmemo")){
-                    this.linkedSites.add(new Site(finalizedUrl, notifType, this.options));
+                    this.linkedSites.add(new Site(finalizedUrl, notifType, this.options, this.ui));
 
                     Document jsLink = null;
                     String linkTitle = null;
@@ -124,7 +126,7 @@ class Site {
         }
 
         this.setTitle(doc);
-        System.out.println("Writing "+this.title);
+        this.ui.updateText("Writing "+this.title);
         this.getLinks(doc);
         this.writeToFile(doc);
 

@@ -21,7 +21,8 @@ public class Crawler {
         "https://api-danmemo-us.wrightflyer.net/asset/notice/index?read_more=1";
     static CrawlerOptions options = new CrawlerOptions();
     final static String[] languages = {"en", "jp"};
-    final static Map<String, String> notifHm = Map.of("news", "1", "info", "4", "update", "2", "malfunc", "3");    
+    final static Map<String, String> notifHm = Map.of("news", "1", "info", "4", "update", "2", "malfunc", "3");   
+    static Frame ui;
     public static void main(String[] args) {
         // folder creation for notifications storage
         Path newsPath = Paths.get(mainDirectory + "/notifications/");
@@ -41,13 +42,11 @@ public class Crawler {
             e.printStackTrace();
         }
 
-        /*
         SwingUtilities.invokeLater(() -> {
-            Frame ui = new Frame(options);
+            ui = new Frame(options);
         });
-        */
         //options.toggleLanguage();
-        startParse();
+        //startParse();
     }
 
     static void startParse(){
@@ -92,7 +91,7 @@ public class Crawler {
             ArrayList<Thread> tList = new ArrayList<Thread>();
             for(Element e: ex){
                 if (!options.getSites().contains(e.attr("href"))){
-                    Site site = new Site(e.attr("href"), set.getKey(), options);
+                    Site site = new Site(e.attr("href"), set.getKey(), options, ui);
                     Thread t = new Thread(() -> site.crawl());
                     t.start();
                     tList.add(t);
@@ -109,6 +108,6 @@ public class Crawler {
             }
             options.updateFile();
         }
-        System.out.println("Completed parsing");
+        ui.updateText("Completed parsing");
     }
 }
