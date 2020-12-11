@@ -28,7 +28,6 @@ class Site {
         this.options = options;
 
         if(!options.getSites().contains(this.url)){
-            System.out.println(this.url+" does not exists");
             Pattern pattern = Pattern.compile("(.*\\.net)(.*)");
             Pattern cdnPattern = Pattern.compile("(.*\\/us\\/)(.*)");
 
@@ -58,8 +57,6 @@ class Site {
                     this.official = false;
                 }
             } 
-        } else {
-            System.out.println(this.url+" exists.");
         }
     }
 
@@ -133,7 +130,8 @@ class Site {
 
         for(Site site: this.linkedSites) {
             if (site.getOfficial()){
-                site.crawl();
+                Thread t = new Thread(() -> site.crawl());
+                t.start();
             }
         }
     }
@@ -158,7 +156,6 @@ class Site {
                 InputStream in = new URL(css.attr("abs:href")).openStream();
                 Files.copy(in, Paths.get(directory + "css/" + cssName));
             } catch (Exception e) {
-                e.printStackTrace();
             }
         };
         css.attr("href", "./css/" + cssName);
@@ -185,7 +182,6 @@ class Site {
                         InputStream in = new URL(j.attr("abs:src")).openStream();
                         Files.copy(in, Paths.get(directory + "js/" + jsName));
                     } catch (Exception e) {
-                        e.printStackTrace();
                     }
                 }
                 j.attr("src", "./js/" + jsName);
@@ -210,7 +206,6 @@ class Site {
                             Paths.get(imgPath)
                     );
                 } catch (Exception e){
-                    e.printStackTrace();
                 }
             }
 

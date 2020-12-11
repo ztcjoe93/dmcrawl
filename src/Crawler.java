@@ -13,6 +13,8 @@ import java.awt.Image;
 import java.io.*;
 import java.nio.file.*;
 
+import java.util.ArrayList;
+
 public class Crawler {
     final static String mainDirectory = System.getProperty("user.dir");
     final static String baseUrl = 
@@ -39,9 +41,13 @@ public class Crawler {
             e.printStackTrace();
         }
 
-
+        /*
+        SwingUtilities.invokeLater(() -> {
+            Frame ui = new Frame(options);
+        });
+        */
         //options.toggleLanguage();
-        //startParse();
+        startParse();
     }
 
     static void startParse(){
@@ -81,16 +87,28 @@ public class Crawler {
                     break;
             }
             ex = doc.select("#tab-panel" + set.getValue() + " > .newsFeed > a");
-            System.out.println(options.getSites());
 
             String directory = "notifications/" + lang + "/" + set.getKey() + "/";
+            ArrayList<Thread> tList = new ArrayList<Thread>();
             for(Element e: ex){
                 if (!options.getSites().contains(e.attr("href"))){
                     Site site = new Site(e.attr("href"), set.getKey(), options);
-                    site.crawl();
+                    Thread t = new Thread(() -> site.crawl());
+                    t.start();
+                    tList.add(t);
+                }
+            }
+            while(true){
+                try {
+                    for (Thread t: tList){
+                        t.join();
+                    }
+                    break;
+                } catch (Exception e){
                 }
             }
             options.updateFile();
         }
+        System.out.println("Completed parsing");
     }
 }
