@@ -20,41 +20,47 @@ class Site {
     private ArrayList<Site> linkedSites = new ArrayList<Site>();
     private String lang, notifType;
     private boolean official;
+    private CrawlerOptions options;
 
-    Site(String url, String notifType) {
+    Site(String url, String notifType, CrawlerOptions options) {
         this.url = url;
         this.notifType = notifType;
+        this.options = options;
 
-        Pattern pattern = Pattern.compile("(.*\\.net)(.*)");
-        Pattern cdnPattern = Pattern.compile("(.*\\/us\\/)(.*)");
+        if(!options.getSites().contains(this.url)){
+            System.out.println(this.url+" does not exists");
+            Pattern pattern = Pattern.compile("(.*\\.net)(.*)");
+            Pattern cdnPattern = Pattern.compile("(.*\\/us\\/)(.*)");
 
-        Matcher matcher = pattern.matcher(url);
+            Matcher matcher = pattern.matcher(url);
 
-        while (matcher.find()) {
-            this.baseUrl = matcher.group(1);
-            // check for non-danmemo urls
-            if (baseUrl.contains("api-danmemo") || baseUrl.contains("cdn-danmemo")) {
-                this.official = true;
-                if (baseUrl.contains("cdn")){
-                   Matcher cdnMatcher = cdnPattern.matcher(url);
+            while (matcher.find()) {
+                this.baseUrl = matcher.group(1);
+                // check for non-danmemo urls
+                if (baseUrl.contains("api-danmemo") || baseUrl.contains("cdn-danmemo")) {
+                    this.official = true;
+                    if (baseUrl.contains("cdn")){
+                       Matcher cdnMatcher = cdnPattern.matcher(url);
 
-                  if (cdnMatcher.find()){
-                      this.lang = "en";
-                  } else {
-                      this.lang = "jp";
-                  }
-                } else {
-                    if (baseUrl.contains("us")) {
-                        this.lang = "en"; 
+                      if (cdnMatcher.find()){
+                          this.lang = "en";
+                      } else {
+                          this.lang = "jp";
+                      }
                     } else {
-                        this.lang = "jp";
-                    } 
+                        if (baseUrl.contains("us")) {
+                            this.lang = "en"; 
+                        } else {
+                            this.lang = "jp";
+                        } 
+                    }
+                } else {
+                    this.official = false;
                 }
-            } else {
-                this.official = false;
-            }
-        } 
-        System.out.println(this.url);
+            } 
+        } else {
+            System.out.println(this.url+" exists.");
+        }
     }
 
     boolean getOfficial(){
@@ -88,7 +94,7 @@ class Site {
                 }
 
                 if (finalizedUrl.contains("api-danmemo") || finalizedUrl.contains("cdn-danmemo")){
-                    this.linkedSites.add(new Site(finalizedUrl, notifType));
+                    this.linkedSites.add(new Site(finalizedUrl, notifType, this.options));
 
                     Document jsLink = null;
                     String linkTitle = null;
@@ -121,9 +127,9 @@ class Site {
         }
 
         this.setTitle(doc);
+        System.out.println("Writing "+this.title);
         this.getLinks(doc);
         this.writeToFile(doc);
-
 
         for(Site site: this.linkedSites) {
             if (site.getOfficial()){
@@ -216,6 +222,7 @@ class Site {
                 new FileWriter(directory+this.title+".html")
             );
             writer.write(doc.outerHtml());
+            this.options.addSite(this.url);
             writer.close();
         } catch (IOException e) {
             e.printStackTrace();

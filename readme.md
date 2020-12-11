@@ -6,6 +6,7 @@ Simple Java application to crawl and store in-game news for the DanMachi - MEMOR
 ## Features
 - [x] Recursive crawler to identify and store html pages within each category of news (News, DanMachi Info, Update, Malfunction)
 - [x] Local storage for images/css/js instead of referencing to CDN
+- [x] Storing of parsed sites for quicker parsing
 - [x] Crawls both EN/JP API
 
 ## In-progress

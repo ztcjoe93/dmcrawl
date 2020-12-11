@@ -39,6 +39,8 @@ public class Crawler {
             e.printStackTrace();
         }
 
+
+        //options.toggleLanguage();
         //startParse();
     }
 
@@ -79,10 +81,16 @@ public class Crawler {
                     break;
             }
             ex = doc.select("#tab-panel" + set.getValue() + " > .newsFeed > a");
+            System.out.println(options.getSites());
+
+            String directory = "notifications/" + lang + "/" + set.getKey() + "/";
             for(Element e: ex){
-                Site site = new Site(e.attr("href"), set.getKey());
-                site.crawl();
+                if (!options.getSites().contains(e.attr("href"))){
+                    Site site = new Site(e.attr("href"), set.getKey(), options);
+                    site.crawl();
+                }
             }
+            options.updateFile();
         }
     }
 }
